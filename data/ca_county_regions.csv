@@ -1,0 +1,59 @@
+region_id,county_name,census_url
+1,Butte,https://census.ca.gov/regions/
+1,Colusa,https://census.ca.gov/regions/
+1,El Dorado,https://census.ca.gov/regions/
+1,Glenn,https://census.ca.gov/regions/
+1,Lassen,https://census.ca.gov/regions/
+1,Modoc,https://census.ca.gov/regions/
+1,Nevada,https://census.ca.gov/regions/
+1,Placer,https://census.ca.gov/regions/
+1,Plumas,https://census.ca.gov/regions/
+1,Sacramento,https://census.ca.gov/regions/
+1,Shasta,https://census.ca.gov/regions/
+1,Sierra,https://census.ca.gov/regions/
+1,Siskiyou,https://census.ca.gov/regions/
+1,Sutter,https://census.ca.gov/regions/
+1,Tehama,https://census.ca.gov/regions/
+1,Yolo,https://census.ca.gov/regions/
+1,Yuba,https://census.ca.gov/regions/
+2,Del Norte,https://census.ca.gov/regions/
+2,Humboldt,https://census.ca.gov/regions/
+2,Lake,https://census.ca.gov/regions/
+2,Mendocino,https://census.ca.gov/regions/
+2,Napa,https://census.ca.gov/regions/
+2,Sonoma,https://census.ca.gov/regions/
+2,Trinity,https://census.ca.gov/regions/
+3,Alameda,https://census.ca.gov/regions/
+3,Contra Costa,https://census.ca.gov/regions/
+3,Marin,https://census.ca.gov/regions/
+3,San Francisco,https://census.ca.gov/regions/
+3,San Mateo,https://census.ca.gov/regions/
+3,Santa Clara,https://census.ca.gov/regions/
+3,Solano,https://census.ca.gov/regions/
+4,Alpine,https://census.ca.gov/regions/
+4,Amador,https://census.ca.gov/regions/
+4,Calaveras,https://census.ca.gov/regions/
+4,Madera,https://census.ca.gov/regions/
+4,Mariposa,https://census.ca.gov/regions/
+4,Merced,https://census.ca.gov/regions/
+4,Mono,https://census.ca.gov/regions/
+4,San Joaquin,https://census.ca.gov/regions/
+4,Stanislaus,https://census.ca.gov/regions/
+4,Tuolumne,https://census.ca.gov/regions/
+5,Monterey,https://census.ca.gov/regions/
+5,San Benito,https://census.ca.gov/regions/
+5,San Luis Obispo,https://census.ca.gov/regions/
+5,Santa Barbara,https://census.ca.gov/regions/
+5,Santa Cruz,https://census.ca.gov/regions/
+5,Ventura,https://census.ca.gov/regions/
+6,Fresno,https://census.ca.gov/regions/
+6,Inyo,https://census.ca.gov/regions/
+6,Kern,https://census.ca.gov/regions/
+6,Kings,https://census.ca.gov/regions/
+6,Tulare,https://census.ca.gov/regions/
+7,Riverside,https://census.ca.gov/regions/
+7,San Bernardino,https://census.ca.gov/regions/
+8,Los Angeles,https://census.ca.gov/regions/
+9,Orange,https://census.ca.gov/regions/
+10,Imperial,https://census.ca.gov/regions/
+10,San Diego,https://census.ca.gov/regions/

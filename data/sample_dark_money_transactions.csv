@@ -1,0 +1,125 @@
+import pandas as pd
+import numpy as np
+from pathlib import Path
+
+
+REQUIRED_COLUMNS = [
+    "transaction_id",
+    "transaction_date",
+    "donor_name",
+    "donor_type",
+    "recipient_name",
+    "recipient_type",
+    "amount_usd",
+    "filer",
+    "state",
+    "entity_class",
+    "transaction_type",
+    "source",
+    "notes",
+]
+
+
+def load_transactions(csv_path: str | Path) -> pd.DataFrame:
+    df = pd.read_csv(csv_path)
+
+    missing = [col for col in REQUIRED_COLUMNS if col not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}")
+
+    df["transaction_date"] = pd.to_datetime(df["transaction_date"], errors="coerce")
+    df["amount_usd"] = pd.to_numeric(df["amount_usd"], errors="coerce")
+
+    # basic cleaning
+    for col in ["donor_name", "recipient_name", "filer", "state", "entity_class", "transaction_type", "source"]:
+        if col in df.columns:
+            df[col] = df[col].astype(str).str.strip()
+
+    df["donor_name"] = df["donor_name"].replace({"nan": "Unknown", "None": "Unknown"})
+    df["recipient_name"] = df["recipient_name"].replace({"nan": "Unknown", "None": "Unknown"})
+
+    df = df.dropna(subset=["transaction_date", "amount_usd"]).copy()
+    df["year"] = df["transaction_date"].dt.year
+    df["month"] = df["transaction_date"].dt.to_period("M").astype(str)
+
+    return df
+
+
+def build_monthly_rollup(df: pd.DataFrame) -> pd.DataFrame:
+    return (
+        df.groupby(["month", "transaction_type"], as_index=False)
+        .agg(
+            total_amount=("amount_usd", "sum"),
+            transaction_count=("transaction_id", "count"),
+        )
+        .sort_values(["month", "total_amount"], ascending=[True, False])
+        .reset_index(drop=True)
+    )
+
+
+def build_donor_summary(df: pd.DataFrame) -> pd.DataFrame:
+    return (
+        df.groupby(["donor_name", "donor_type"], as_index=False)
+        .agg(total_given=("amount_usd", "sum"), transaction_count=("transaction_id", "count"))
+        .sort_values("total_given", ascending=False)
+        .reset_index(drop=True)
+    )
+
+
+def build_recipient_summary(df: pd.DataFrame) -> pd.DataFrame:
+    return (
+        df.groupby(["recipient_name", "recipient_type"], as_index=False)
+        .agg(total_received=("amount_usd", "sum"), transaction_count=("transaction_id", "count"))
+        .sort_values("total_received", ascending=False)
+        .reset_index(drop=True)
+    )
+
+
+def build_top_paths(df: pd.DataFrame, n: int = 100) -> pd.DataFrame:
+    path_df = (
+        df.groupby(["donor_name", "recipient_name"], as_index=False)
+        .agg(total_amount=("amount_usd", "sum"), transaction_count=("transaction_id", "count"))
+        .sort_values("total_amount", ascending=False)
+        .head(n)
+        .reset_index(drop=True)
+    )
+    return path_df
+
+
+def build_state_summary(df: pd.DataFrame) -> pd.DataFrame:
+    return (
+        df.groupby(["state", "recipient_type"], as_index=False)
+        .agg(total_amount=("amount_usd", "sum"), transaction_count=("transaction_id", "count"))
+        .sort_values(["state", "total_amount"], ascending=[True, False])
+        .reset_index(drop=True)
+    )
+
+
+def main() -> None:
+    base_dir = Path(__file__).resolve().parent.parent
+    data_dir = base_dir / "data"
+    output_dir = data_dir / "outputs"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    input_path = data_dir / "sample_dark_money_transactions.csv"
+    transactions = load_transactions(input_path)
+
+    monthly = build_monthly_rollup(transactions)
+    donors = build_donor_summary(transactions)
+    recipients = build_recipient_summary(transactions)
+    top_paths = build_top_paths(transactions, n=100)
+    state_summary = build_state_summary(transactions)
+
+    monthly.to_csv(output_dir / "monthly_rollup.csv", index=False)
+    donors.to_csv(output_dir / "donor_summary.csv", index=False)
+    recipients.to_csv(output_dir / "recipient_summary.csv", index=False)
+    top_paths.to_csv(output_dir / "top_paths.csv", index=False)
+    state_summary.to_csv(output_dir / "state_summary.csv", index=False)
+
+    print("Generated files:")
+    for path in sorted(output_dir.glob("*.csv")):
+        print(f"- {path.name}: {len(pd.read_csv(path))} rows")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,93 @@
+-- Top donors by total amount
+SELECT
+  donor_name,
+  donor_type,
+  SUM(amount_usd) AS total_given,
+  COUNT(transaction_id) AS tx_count
+FROM dark_money_transactions
+GROUP BY donor_name, donor_type
+ORDER BY total_given DESC;
+
+-- Top recipients by total received
+SELECT
+  recipient_name,
+  recipient_type,
+  SUM(amount_usd) AS total_received,
+  COUNT(transaction_id) AS tx_count
+FROM dark_money_transactions
+GROUP BY recipient_name, recipient_type
+ORDER BY total_received DESC;
+
+-- Monthly totals by transaction type
+SELECT
+  DATE_TRUNC('month', transaction_date) AS month,
+  transaction_type,
+  SUM(amount_usd) AS total_amount,
+  COUNT(transaction_id) AS transaction_count
+FROM dark_money_transactions
+GROUP BY DATE_TRUNC('month', transaction_date), transaction_type
+ORDER BY month ASC, total_amount DESC;
+
+-- Donor-to-recipient network paths
+SELECT
+  donor_name,
+  recipient_name,
+  SUM(amount_usd) AS total_amount,
+  COUNT(transaction_id) AS transaction_count
+FROM dark_money_transactions
+GROUP BY donor_name, recipient_name
+ORDER BY total_amount DESC;
+
+-- State-level summary
+SELECT
+  state,
+  recipient_type,
+  SUM(amount_usd) AS total_amount,
+  COUNT(transaction_id) AS transaction_count
+FROM dark_money_transactions
+GROUP BY state, recipient_type
+ORDER BY state ASC, total_amount DESC;
+
+-- Simple rolling monthly trend
+SELECT
+  DATE_TRUNC('month', transaction_date) AS month,
+  SUM(amount_usd) AS total_monthly_amount
+FROM dark_money_transactions
+GROUP BY DATE_TRUNC('month', transaction_date)
+ORDER BY month ASC;
+
+-- Recipient concentration metric
+SELECT
+  recipient_name,
+  SUM(amount_usd) AS total_received,
+  ROUND(100.0 * SUM(amount_usd) / (SELECT SUM(amount_usd) FROM dark_money_transactions), 2) AS share_of_total
+FROM dark_money_transactions
+GROUP BY recipient_name
+ORDER BY total_received DESC;
+
+-- Donor concentration metric
+SELECT
+  donor_name,
+  SUM(amount_usd) AS total_given,
+  ROUND(100.0 * SUM(amount_usd) / (SELECT SUM(amount_usd) FROM dark_money_transactions), 2) AS share_of_total
+FROM dark_money_transactions
+GROUP BY donor_name
+ORDER BY total_given DESC;
+
+-- Example Hex filter / dashboard parameter pattern
+SELECT *
+FROM dark_money_transactions
+WHERE transaction_date >= DATE('2024-01-01')
+  AND amount_usd >= 250000
+ORDER BY amount_usd DESC;
+
+-- Example cohort filter for a dashboard selector
+SELECT
+  donor_name,
+  recipient_name,
+  amount_usd,
+  state,
+  month
+FROM dark_money_transactions
+WHERE donor_type = 'Corporation'
+  OR recipient_type = 'Political Committee';
